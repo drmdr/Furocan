@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧴 風呂キャン止めるくん
 
-## Getting Started
+シャンプー習慣をブロックチェーンで記録するBase Mini App
 
-First, run the development server:
+## 機能
+
+- ✅ ウォレット接続（MetaMask、Coinbase Wallet、WalletConnect）
+- ✅ シャンプー記録をブロックチェーンに保存
+- ✅ シャンプーしなかった日をローカルストレージに記録
+- 🚧 カレンダー表示（今後実装予定）
+
+## 技術スタック
+
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
+- **Blockchain**: Base Network, Solidity
+- **Web3**: wagmi, viem
+- **Development**: Hardhat
+
+## セットアップ
 
 ```bash
+# 依存関係のインストール
+npm install
+
+# 開発サーバー起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# ビルド
+npm run build
+
+# テスト実行
+npm test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## デプロイ
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+このアプリはVercelにデプロイされています。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## コントラクト
 
-## Learn More
+ShampooTrackerコントラクトはBase Sepoliaテストネットにデプロイされています。
 
-To learn more about Next.js, take a look at the following resources:
+## ライセンス
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
