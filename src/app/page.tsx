@@ -5,7 +5,7 @@ import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt,
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { SHAMPOO_TRACKER_ABI, CONTRACT_ADDRESSES } from '../lib/contract'
-import { saveNoShampooRecord, getTodayDateString, getNoShampooRecordForDate } from '../lib/localStorage'
+import { saveNoShampooRecord, getTodayDateString } from '../lib/localStorage'
 import WalletButton from '../components/WalletButton'
 
 interface ShampooLog {
@@ -98,7 +98,6 @@ export default function ShampooTracker() {
       
       // 「生きててえらい」ポップアップ
       setShowNoShampooPopup(true)
-      setTimeout(() => setShowNoShampooPopup(false), 3000)
     }
 
     const newLog = {
@@ -125,7 +124,6 @@ export default function ShampooTracker() {
       const randomMessage = messages[Math.floor(Math.random() * messages.length)]
       setSuccessMessage(randomMessage)
       setShowSuccessPopup(true)
-      setTimeout(() => setShowSuccessPopup(false), 3000)
     }
   }, [isConfirmed])
 
@@ -133,20 +131,44 @@ export default function ShampooTracker() {
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto">
       {/* Success Popup */}
       {showSuccessPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-          <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground p-6 rounded-2xl shadow-xl animate-bounce max-w-sm w-full text-center">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
+          <div className="bg-primary text-primary-foreground p-6 rounded-2xl shadow-xl max-w-sm w-full text-center relative">
+            <button
+              onClick={() => setShowSuccessPopup(false)}
+              className="absolute top-2 right-2 text-primary-foreground hover:text-primary-foreground/80 text-xl font-bold"
+            >
+              ×
+            </button>
             <div className="text-4xl mb-2">🎉</div>
             <p className="font-bold text-lg">{successMessage}</p>
+            <button
+              onClick={() => setShowSuccessPopup(false)}
+              className="mt-4 px-4 py-2 bg-primary-foreground text-primary rounded-lg hover:bg-primary-foreground/90 transition-colors"
+            >
+              閉じる
+            </button>
           </div>
         </div>
       )}
 
       {/* No Shampoo Popup */}
       {showNoShampooPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-          <div className="bg-secondary/90 backdrop-blur-sm text-secondary-foreground p-6 rounded-2xl shadow-xl animate-pulse max-w-sm w-full text-center">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
+          <div className="bg-secondary text-secondary-foreground p-6 rounded-2xl shadow-xl max-w-sm w-full text-center relative">
+            <button
+              onClick={() => setShowNoShampooPopup(false)}
+              className="absolute top-2 right-2 text-secondary-foreground hover:text-secondary-foreground/80 text-xl font-bold"
+            >
+              ×
+            </button>
             <div className="text-4xl mb-2">💜</div>
             <p className="font-bold text-lg">生きててえらい！</p>
+            <button
+              onClick={() => setShowNoShampooPopup(false)}
+              className="mt-4 px-4 py-2 bg-secondary-foreground text-secondary rounded-lg hover:bg-secondary-foreground/90 transition-colors"
+            >
+              閉じる
+            </button>
           </div>
         </div>
       )}
@@ -178,7 +200,7 @@ export default function ShampooTracker() {
           <Button
             onClick={() => handleShampooAction(true)}
             disabled={isWritePending || isConfirming}
-            className="flex-1 h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl shadow-lg"
+            className="flex-1 h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl shadow-xl"
           >
             {isWritePending && '署名待ち...'}
             {isConfirming && '記録中...'}
@@ -186,8 +208,8 @@ export default function ShampooTracker() {
           </Button>
           <Button
             onClick={() => handleShampooAction(false)}
-            variant="secondary"
-            className="flex-1 h-14 text-base font-semibold bg-muted hover:bg-muted/80 text-muted-foreground rounded-2xl shadow-lg"
+            variant="outline"
+            className="flex-1 h-14 text-base font-semibold bg-transparent border-2 border-secondary text-secondary hover:bg-secondary/10 rounded-2xl shadow-xl"
           >
             今日はパス
           </Button>
