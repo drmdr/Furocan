@@ -170,7 +170,7 @@ export default function ShampooTracker() {
               <span className="text-6xl">🧴</span>
             </div>
           </div>
-          <div className="absolute -top-2 -right-2 text-2xl animate-bounce">🌸</div>
+
         </div>
 
         {/* Action Buttons */}
@@ -182,16 +182,14 @@ export default function ShampooTracker() {
           >
             {isWritePending && '署名待ち...'}
             {isConfirming && '記録中...'}
-            {!isWritePending && !isConfirming && (
-              isConnected ? 'シャンプーした！' : 'シャンプーした！（接続）'
-            )}
+            {!isWritePending && !isConfirming && 'シャンプーした！'}
           </Button>
           <Button
             onClick={() => handleShampooAction(false)}
             variant="secondary"
             className="flex-1 h-14 text-base font-semibold bg-muted hover:bg-muted/80 text-muted-foreground rounded-2xl shadow-lg"
           >
-            今日はパス 💜
+            今日はパス
           </Button>
         </div>
 
@@ -235,7 +233,7 @@ export default function ShampooTracker() {
                     </span>
                   </div>
                   <span className="text-sm">
-                    {log.shampooed ? "🧴 シャンプーした" : "💜 パス"}
+                    {log.shampooed ? "🧴 シャンプーした" : "パス"}
                   </span>
                 </div>
               </Card>
