@@ -1,20 +1,14 @@
 import { http, createConfig } from 'wagmi'
 import { base, baseSepolia } from 'wagmi/chains'
-import { coinbaseWallet, metaMask, walletConnect } from 'wagmi/connectors'
-
-// WalletConnect project ID (replace with your own)
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'demo-project-id'
+import { coinbaseWallet } from 'wagmi/connectors'
 
 export const config = createConfig({
   chains: [base, baseSepolia],
   connectors: [
-    metaMask(),
     coinbaseWallet({
       appName: '風呂キャン止めるくん',
-      appLogoUrl: '/next.svg',
-    }),
-    walletConnect({
-      projectId,
+      appLogoUrl: '/favicon.ico',
+      preference: 'smartWalletOnly', // Base App Wallet専用
     }),
   ],
   transports: {
