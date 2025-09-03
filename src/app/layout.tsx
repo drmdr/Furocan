@@ -49,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`font-sans ${hachiMaruPop.variable} ${GeistMono.variable}`}>
+      <body className={`${hachiMaruPop.variable} ${GeistMono.variable} font-sans`}>
         <Providers>
           <Suspense fallback={null}>
             {children}
