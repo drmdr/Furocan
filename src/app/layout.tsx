@@ -1,37 +1,38 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Providers } from './providers';
+import type React from "react"
+import type { Metadata } from "next"
+import { Poppins } from "next/font/google"
+import { GeistMono } from "geist/font/mono"
+import { Suspense } from "react"
+import "./globals.css"
+import { Providers } from './providers'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: "風呂キャン止めるくん",
-  description: "シャンプー習慣をBaseネットワーク上のブロックチェーンで記録するWeb3アプリ",
-};
+  title: "風呂キャン止めるくん - Shampoo Tracker",
+  description: "シャンプー習慣をブロックチェーンで記録するBase Mini App",
+  generator: "v0.app",
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="ja">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`font-sans ${poppins.variable} ${GeistMono.variable}`}>
         <Providers>
-          {children}
+          <Suspense fallback={null}>
+            {children}
+          </Suspense>
         </Providers>
       </body>
     </html>
-  );
+  )
 }
