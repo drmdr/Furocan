@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt, useChainId } from 'wagmi'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -11,6 +11,7 @@ import WalletButton from '../components/WalletButton'
 interface ShampooLog {
   id: number
   date: string
+  time: string
   shampooed: boolean
 }
 
@@ -20,12 +21,15 @@ export default function ShampooTracker() {
   const chainId = useChainId()
   
   const [logs, setLogs] = useState<ShampooLog[]>([
-    { id: 1, date: "2024-01-15", shampooed: true },
-    { id: 2, date: "2024-01-14", shampooed: false },
-    { id: 3, date: "2024-01-13", shampooed: true },
+    { id: 1, date: "2024-01-15", time: "19:30", shampooed: true },
+    { id: 2, date: "2024-01-14", time: "20:15", shampooed: false },
+    { id: 3, date: "2024-01-13", time: "18:45", shampooed: true },
   ])
-  const [message, setMessage] = useState("今日の髪の調子はどう？ ✨")
   const [activeTab, setActiveTab] = useState("home")
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [showNoShampooPopup, setShowNoShampooPopup] = useState(false)
+  const [successMessage, setSuccessMessage] = useState("")
+  const [showError, setShowError] = useState(false)
 
   const { 
     writeContract, 
@@ -43,6 +47,13 @@ export default function ShampooTracker() {
 
   const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]
 
+  // エラー表示の管理
+  useEffect(() => {
+    if (writeError) {
+      setShowError(true)
+    }
+  }, [writeError])
+
   const handleConnect = () => {
     const coinbaseConnector = connectors.find(connector => 
       connector.name.toLowerCase().includes('coinbase')
@@ -54,6 +65,11 @@ export default function ShampooTracker() {
 
   const handleShampooAction = async (shampooed: boolean) => {
     const today = getTodayDateString()
+    const now = new Date()
+    const timeString = now.toLocaleTimeString('ja-JP', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    })
     
     if (shampooed) {
       // ブロックチェーンに記録
@@ -79,54 +95,64 @@ export default function ShampooTracker() {
         date: today,
         reason: '今日はシャンプーしなかった'
       })
+      
+      // 「生きててえらい」ポップアップ
+      setShowNoShampooPopup(true)
+      setTimeout(() => setShowNoShampooPopup(false), 3000)
     }
 
     const newLog = {
       id: logs.length + 1,
       date: today,
+      time: timeString,
       shampooed,
     }
     setLogs([newLog, ...logs.slice(0, 2)]) // Keep only last 3 logs
-
-    if (shampooed) {
-      const messages = [
-        "シャンプーしてえらい！ ✨",
-        "髪がいい匂いになったね！ 🌸",
-        "清潔な髪、清潔な気持ち！ 💕",
-        "ピカピカで可愛い！ ✨",
-      ]
-      setMessage(messages[Math.floor(Math.random() * messages.length)])
-    } else {
-      const messages = [
-        "生きててえらい！ 💜",
-        "明日は新しい日～ 🌙",
-        "セルフケアにはいろんな形があるよ ✨",
-        "そのままで完璧だよ！ 💕",
-      ]
-      setMessage(messages[Math.floor(Math.random() * messages.length)])
-    }
   }
 
   // Show success message when transaction is confirmed
-  if (isConfirmed) {
-    const messages = [
-      "ブロックチェーンに記録されました！ ✨",
-      "永続的に保存されたよ！ 🌸",
-      "Web3でシャンプー記録完了！ 💕",
-    ]
-    setMessage(messages[Math.floor(Math.random() * messages.length)])
-  }
+  useEffect(() => {
+    if (isConfirmed) {
+      const messages = [
+        "ブロックチェーンに記録されました！",
+        "永続的に保存されたよ！",
+        "Web3でシャンプー記録完了！",
+        "清潔な髪、清潔な気持ち！",
+        "シャンプーしてえらい！",
+        "髪がいい匂いになったね！",
+        "ピカピカで可愛い！"
+      ]
+      const randomMessage = messages[Math.floor(Math.random() * messages.length)]
+      setSuccessMessage(randomMessage)
+      setShowSuccessPopup(true)
+      setTimeout(() => setShowSuccessPopup(false), 3000)
+    }
+  }, [isConfirmed])
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header with Wallet Button */}
-      <header className="flex justify-between items-center p-6">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center">
-            <span className="text-primary-foreground text-sm font-bold">🧴</span>
+    <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto">
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground p-6 rounded-2xl shadow-xl animate-bounce max-w-sm w-full text-center">
+            <div className="text-4xl mb-2">🎉</div>
+            <p className="font-bold text-lg">{successMessage}</p>
           </div>
-          <h1 className="text-foreground font-bold text-xl">風呂キャン止めるくん</h1>
         </div>
+      )}
+
+      {/* No Shampoo Popup */}
+      {showNoShampooPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="bg-secondary/90 backdrop-blur-sm text-secondary-foreground p-6 rounded-2xl shadow-xl animate-pulse max-w-sm w-full text-center">
+            <div className="text-4xl mb-2">💜</div>
+            <p className="font-bold text-lg">生きててえらい！</p>
+          </div>
+        </div>
+      )}
+
+      {/* Header with Wallet Button */}
+      <header className="flex justify-end items-center p-4">
         <WalletButton />
       </header>
 
@@ -134,8 +160,7 @@ export default function ShampooTracker() {
       <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-primary font-sans">Shampoo Tracker</h1>
-          <p className="text-muted-foreground text-sm">あなたのヘアケアの旅を記録しよう ✨</p>
+          <h1 className="text-3xl font-bold text-primary font-sans">風呂キャン止めるくん</h1>
         </div>
 
         {/* Anime Girl Placeholder */}
@@ -149,31 +174,26 @@ export default function ShampooTracker() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-4 w-full max-w-sm">
+        <div className="flex gap-3 w-full max-w-sm">
           <Button
             onClick={() => handleShampooAction(true)}
             disabled={isWritePending || isConfirming}
-            className="flex-1 h-14 text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl shadow-lg"
+            className="flex-1 h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl shadow-lg"
           >
             {isWritePending && '署名待ち...'}
             {isConfirming && '記録中...'}
             {!isWritePending && !isConfirming && (
-              isConnected ? 'シャンプーした！ ✨' : 'シャンプーした！ ✨（接続）'
+              isConnected ? 'シャンプーした！' : 'シャンプーした！（接続）'
             )}
           </Button>
           <Button
             onClick={() => handleShampooAction(false)}
             variant="secondary"
-            className="flex-1 h-14 text-lg font-semibold bg-muted hover:bg-muted/80 text-muted-foreground rounded-2xl shadow-lg"
+            className="flex-1 h-14 text-base font-semibold bg-muted hover:bg-muted/80 text-muted-foreground rounded-2xl shadow-lg"
           >
             今日はパス 💜
           </Button>
         </div>
-
-        {/* Message Area */}
-        <Card className="w-full max-w-sm p-4 bg-card/50 backdrop-blur-sm border-primary/20">
-          <p className="text-center text-card-foreground font-medium">{message}</p>
-        </Card>
 
         {/* Network Warning */}
         {isConnected && !contractAddress && (
@@ -184,10 +204,16 @@ export default function ShampooTracker() {
           </Card>
         )}
 
-        {/* Error Display */}
-        {writeError && (
-          <Card className="w-full max-w-sm p-4 bg-destructive/10 border-destructive/20">
-            <p className="text-destructive text-sm text-center">
+        {/* Error Display with Close Button */}
+        {showError && writeError && (
+          <Card className="w-full max-w-sm p-4 bg-destructive/10 border-destructive/20 relative">
+            <button
+              onClick={() => setShowError(false)}
+              className="absolute top-2 right-2 text-destructive hover:text-destructive/80 text-xl"
+            >
+              ×
+            </button>
+            <p className="text-destructive text-sm text-center pr-6">
               エラー: {writeError.message}
             </p>
           </Card>
@@ -200,11 +226,16 @@ export default function ShampooTracker() {
             {logs.map((log) => (
               <Card key={log.id} className="p-3 bg-card/30 border-primary/10">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-card-foreground">
-                    {new Date(log.date).toLocaleDateString('ja-JP')}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-card-foreground">
+                      {new Date(log.date).toLocaleDateString('ja-JP')}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {log.time}
+                    </span>
+                  </div>
                   <span className="text-sm">
-                    {log.shampooed ? "✨ シャンプーした" : "💜 パス"}
+                    {log.shampooed ? "🧴 シャンプーした" : "💜 パス"}
                   </span>
                 </div>
               </Card>

@@ -1,15 +1,15 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Poppins } from "next/font/google"
+import { Hachi_Maru_Pop } from "next/font/google"
 import { GeistMono } from "geist/font/mono"
 import { Suspense } from "react"
 import "./globals.css"
 import { Providers } from './providers'
 
-const poppins = Poppins({
+const hachiMaruPop = Hachi_Maru_Pop({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
+  weight: ["400"],
+  variable: "--font-hachi-maru-pop",
   display: "swap",
 })
 
@@ -49,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`font-sans ${poppins.variable} ${GeistMono.variable}`}>
+      <body className={`font-sans ${hachiMaruPop.variable} ${GeistMono.variable}`}>
         <Providers>
           <Suspense fallback={null}>
             {children}

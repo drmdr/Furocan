@@ -76,8 +76,8 @@
 }
 
 @theme inline {
-/* Updated font configuration to use Poppins as primary font */
---font-sans: var(--font-poppins);
+/* Updated font configuration to use Hachi Maru Pop as primary font */
+--font-sans: var(--font-hachi-maru-pop);
 --font-mono: var(--font-geist-mono);
 --color-background: var(--background);
 --color-foreground: var(--foreground);
