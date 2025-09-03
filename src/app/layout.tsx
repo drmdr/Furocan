@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "風呂キャン止めるくん",
     images: [
       {
-        url: "/og-image.png",
+        url: "/splash.svg",
         width: 1200,
         height: 630,
         alt: "風呂キャン止めるくん - Shampoo Tracker",
@@ -38,7 +38,16 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "風呂キャン止めるくん",
     description: "シャンプー習慣をブロックチェーンで記録するBase Mini App",
-    images: ["/og-image.png"],
+    images: ["/splash.svg"],
+  },
+  other: {
+    // Farcaster Frame metadata
+    'fc:frame': 'vNext',
+    'fc:frame:image': 'https://furocan.vercel.app/splash.svg',
+    'fc:frame:button:1': 'シャンプー記録を開始',
+    'fc:frame:button:1:action': 'link',
+    'fc:frame:button:1:target': 'https://furocan.vercel.app',
+    'fc:frame:post_url': 'https://furocan.vercel.app/api/frame',
   },
 }
 
