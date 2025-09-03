@@ -209,7 +209,7 @@ export default function ShampooTracker() {
           <Button
             onClick={() => handleShampooAction(false)}
             variant="outline"
-            className="flex-1 h-14 text-base font-semibold bg-transparent border-2 border-secondary text-secondary hover:bg-secondary/10 rounded-2xl shadow-xl"
+            className="flex-1 h-14 text-base font-semibold bg-transparent border-2 border-primary text-primary hover:bg-primary/10 rounded-2xl shadow-xl"
           >
             今日はパス
           </Button>

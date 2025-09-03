@@ -59,9 +59,9 @@ export default function WalletButton() {
   return (
     <button
       onClick={handleConnect}
-      className="flex items-center space-x-2 px-4 py-2 bg-black/40 backdrop-blur-sm border border-pink-500/30 text-pink-300 rounded-full hover:bg-pink-500/20 hover:border-pink-400 transition-all duration-200"
+      className="flex items-center space-x-2 px-4 py-2 bg-transparent border border-red-500 text-red-500 rounded-full hover:bg-red-500/10 hover:border-red-400 transition-all duration-200"
     >
-      <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
       <span className="font-medium">未接続</span>
     </button>
   )
