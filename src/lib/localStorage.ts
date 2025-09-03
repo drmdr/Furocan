@@ -1,73 +1,86 @@
-// Local storage utilities for non-shampoo records
-
 export interface NoShampooRecord {
-  date: string; // YYYY-MM-DD format
-  timestamp: number;
-  reason?: string;
+  id: string
+  date: string
+  time: string
+  timestamp: number
 }
 
-const STORAGE_KEY = 'shampoo-tracker-no-shampoo-records';
+export interface ShampooLog {
+  id: string
+  date: string
+  time: string
+  shampooed: boolean
+  timestamp: number
+}
 
-export const saveNoShampooRecord = (record: Omit<NoShampooRecord, 'timestamp'>): void => {
-  try {
-    // Check if we're in the browser
-    if (typeof window === 'undefined') return;
-    
-    const existingRecords = getNoShampooRecords();
-    const newRecord: NoShampooRecord = {
-      ...record,
-      timestamp: Date.now(),
-    };
-    
-    // Check if record for today already exists
-    const existingIndex = existingRecords.findIndex(r => r.date === record.date);
-    
-    if (existingIndex >= 0) {
-      // Update existing record
-      existingRecords[existingIndex] = newRecord;
-    } else {
-      // Add new record
-      existingRecords.push(newRecord);
-    }
-    
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(existingRecords));
-  } catch (error) {
-    console.error('Failed to save no-shampoo record:', error);
+const NO_SHAMPOO_KEY = 'no-shampoo-records'
+const SHAMPOO_LOGS_KEY = 'shampoo-logs'
+
+export function saveNoShampooRecord(): NoShampooRecord {
+  const now = new Date()
+  const record: NoShampooRecord = {
+    id: crypto.randomUUID(),
+    date: now.toISOString().split('T')[0],
+    time: now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+    timestamp: now.getTime()
   }
-};
+  
+  const existing = getNoShampooRecords()
+  const updated = [record, ...existing].slice(0, 50) // Keep only last 50 records
+  
+  localStorage.setItem(NO_SHAMPOO_KEY, JSON.stringify(updated))
+  
+  // Also add to general logs
+  addToShampooLogs(false)
+  
+  return record
+}
 
-export const getNoShampooRecords = (): NoShampooRecord[] => {
+export function getNoShampooRecords(): NoShampooRecord[] {
+  if (typeof window === 'undefined') return []
+  
   try {
-    // Check if we're in the browser
-    if (typeof window === 'undefined') return [];
-    
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (error) {
-    console.error('Failed to get no-shampoo records:', error);
-    return [];
+    const stored = localStorage.getItem(NO_SHAMPOO_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
   }
-};
+}
 
-export const getNoShampooRecordForDate = (date: string): NoShampooRecord | null => {
-  const records = getNoShampooRecords();
-  return records.find(r => r.date === date) || null;
-};
+export function getNoShampooRecordForDate(date: string): NoShampooRecord | null {
+  const records = getNoShampooRecords()
+  return records.find(record => record.date === date) || null
+}
 
-export const deleteNoShampooRecord = (date: string): void => {
+export function getTodayDateString(): string {
+  return new Date().toISOString().split('T')[0]
+}
+
+export function addToShampooLogs(shampooed: boolean): ShampooLog {
+  const now = new Date()
+  const log: ShampooLog = {
+    id: crypto.randomUUID(),
+    date: now.toISOString().split('T')[0],
+    time: now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+    shampooed,
+    timestamp: now.getTime()
+  }
+  
+  const existing = getShampooLogs()
+  const updated = [log, ...existing].slice(0, 50) // Keep only last 50 records
+  
+  localStorage.setItem(SHAMPOO_LOGS_KEY, JSON.stringify(updated))
+  
+  return log
+}
+
+export function getShampooLogs(): ShampooLog[] {
+  if (typeof window === 'undefined') return []
+  
   try {
-    // Check if we're in the browser
-    if (typeof window === 'undefined') return;
-    
-    const records = getNoShampooRecords();
-    const filteredRecords = records.filter(r => r.date !== date);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredRecords));
-  } catch (error) {
-    console.error('Failed to delete no-shampoo record:', error);
+    const stored = localStorage.getItem(SHAMPOO_LOGS_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
   }
-};
-
-export const getTodayDateString = (): string => {
-  const today = new Date();
-  return today.toISOString().split('T')[0]; // YYYY-MM-DD format
-};
+}

@@ -20,10 +20,7 @@ export default function NoShampooRecorder() {
     setIsRecording(true)
     
     try {
-      saveNoShampooRecord({
-        date: todayDate,
-        reason: '今日はシャンプーしなかった'
-      })
+      saveNoShampooRecord()
       
       setShowSuccess(true)
       setTimeout(() => setShowSuccess(false), 3000)
