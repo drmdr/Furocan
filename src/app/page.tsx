@@ -26,11 +26,18 @@ import { SHAMPOO_TRACKER_ABI, CONTRACT_ADDRESSES } from '../lib/contract'
 import { saveNoShampooRecord, addToShampooLogs, getShampooLogs, type ShampooLog } from '../lib/localStorage'
 
 export default function Page() {
+  // MiniKit hooks
   const { setFrameReady, isFrameReady, context } = useMiniKit()
+  const addFrame = useAddFrame()
+  const openUrl = useOpenUrl()
+  
+  // Wagmi hooks
   const { isConnected } = useAccount()
   const chainId = useChainId()
-  const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]
+  const { writeContract, isPending: isWritePending, error: writeError } = useWriteContract()
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt()
   
+  // State
   const [frameAdded, setFrameAdded] = useState(false)
   const [activeTab, setActiveTab] = useState<"home" | "calendar">("home")
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
@@ -39,30 +46,31 @@ export default function Page() {
   const [showError, setShowError] = useState(false)
   const [logs, setLogs] = useState<ShampooLog[]>([])
 
-  const addFrame = useAddFrame()
-  const openUrl = useOpenUrl()
-  const { writeContract, isPending: isWritePending, error: writeError } = useWriteContract()
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt()
+  const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]
 
+  // Initialize MiniKit
   useEffect(() => {
     if (!isFrameReady) {
       setFrameReady()
     }
   }, [setFrameReady, isFrameReady])
 
+  // Load logs on mount
   useEffect(() => {
     setLogs(getShampooLogs())
   }, [])
 
+  // Handle write errors
   useEffect(() => {
     if (writeError) {
       setShowError(true)
     }
   }, [writeError])
 
+  // Frame management
   const handleAddFrame = useCallback(async () => {
-    const frameAdded = await addFrame()
-    setFrameAdded(Boolean(frameAdded))
+    const result = await addFrame()
+    setFrameAdded(Boolean(result))
   }, [addFrame])
 
   const saveFrameButton = useMemo(() => {
@@ -72,16 +80,16 @@ export default function Page() {
           variant="ghost"
           size="sm"
           onClick={handleAddFrame}
-          className="text-primary p-2"
+          className="text-primary p-2 text-xs"
         >
-          + Save Frame
+          + Save
         </Button>
       )
     }
 
     if (frameAdded) {
       return (
-        <div className="flex items-center space-x-1 text-sm font-medium text-primary animate-fade-out">
+        <div className="flex items-center space-x-1 text-xs font-medium text-primary">
           <span>✓ Saved</span>
         </div>
       )
@@ -90,6 +98,7 @@ export default function Page() {
     return null
   }, [context, frameAdded, handleAddFrame])
 
+  // Main action handler
   const handleShampooAction = async (shampooed: boolean) => {
     if (shampooed) {
       if (!isConnected || !contractAddress) {
@@ -104,11 +113,9 @@ export default function Page() {
           functionName: 'recordShampoo',
         })
 
-        // ローカルログにも追加
         addToShampooLogs(true)
         setLogs(getShampooLogs())
 
-        // ランダムな成功メッセージ
         const messages = [
           '今日もお疲れさま！',
           'きれいになったね！',
@@ -123,18 +130,15 @@ export default function Page() {
         console.error('Transaction failed:', error)
       }
     } else {
-      // 非シャンプー記録（ローカルストレージ）
       saveNoShampooRecord()
       setLogs(getShampooLogs())
-      
-      // 「生きててえらい」ポップアップ
       setShowNoShampooPopup(true)
     }
   }
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-foreground mini-app-theme from-background to-muted">
-      <div className="w-full max-w-md mx-auto px-4 py-3">
+    <div className="flex flex-col min-h-screen font-sans text-foreground bg-background">
+      <div className="w-full max-w-md mx-auto">
         {/* Success Popup */}
         {showSuccessPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
@@ -179,17 +183,17 @@ export default function Page() {
           </div>
         )}
 
-        {/* Header */}
-        <header className="flex justify-between items-center mb-3 h-11">
+        {/* Header - MiniKit Style */}
+        <header className="flex justify-between items-center p-4 h-16">
           <div className="flex items-center space-x-2">
             <span className="text-2xl">🧴</span>
-            <span className="text-sm text-muted-foreground">風呂キャン止めるくん</span>
+            <span className="text-sm text-muted-foreground font-medium">風呂キャン止めるくん</span>
           </div>
           
           <div className="flex items-center space-x-2">
-            <Wallet className="z-10">
+            <Wallet>
               <ConnectWallet>
-                <Name className="text-inherit" />
+                <Name className="text-inherit text-sm" />
               </ConnectWallet>
               <WalletDropdown>
                 <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
@@ -205,48 +209,21 @@ export default function Page() {
           </div>
         </header>
 
-        {/* Navigation */}
-        <nav className="flex justify-center p-4 border-b border-border/10">
-          <div className="flex bg-card/30 rounded-2xl p-1 space-x-1">
-            <button
-              onClick={() => setActiveTab("home")}
-              className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-xl transition-colors ${
-                activeTab === "home"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <div className="text-xl">🏠</div>
-              <span className="text-xs font-medium">ホーム</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("calendar")}
-              className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-xl transition-colors ${
-                activeTab === "calendar"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <div className="text-xl">📅</div>
-              <span className="text-xs font-medium">カレンダー</span>
-            </button>
-          </div>
-        </nav>
-
         {/* Main Content */}
-        <main className="flex-1">
+        <main className="flex-1 px-4">
           {activeTab === "home" && (
-            <div className="flex-1 flex flex-col items-center justify-center space-y-8 p-6">
-              {/* Header */}
-              <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold text-primary font-sans">風呂キャン止めるくん</h1>
+            <div className="flex flex-col items-center space-y-6 pb-20">
+              {/* App Title */}
+              <div className="text-center space-y-2 mt-4">
+                <h1 className="text-2xl font-bold text-primary">風呂キャン止めるくん</h1>
+                <p className="text-sm text-muted-foreground">今日もお疲れさま</p>
               </div>
 
-              {/* Anime Girl Placeholder */}
+              {/* Character Display */}
               <div className="relative">
-                <div className="w-48 h-48 bg-card rounded-full flex items-center justify-center border-4 border-primary/20">
-                  <div className="w-40 h-40 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                    <span className="text-6xl">🧴</span>
+                <div className="w-40 h-40 bg-card rounded-full flex items-center justify-center border-4 border-primary/20 shadow-lg">
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                    <span className="text-5xl">🧴</span>
                   </div>
                 </div>
               </div>
@@ -256,7 +233,7 @@ export default function Page() {
                 <Button
                   onClick={() => handleShampooAction(true)}
                   disabled={isWritePending || isConfirming}
-                  className="flex-1 h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl shadow-xl"
+                  className="flex-1 h-12 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
                 >
                   {isWritePending && '署名待ち...'}
                   {isConfirming && '記録中...'}
@@ -265,73 +242,106 @@ export default function Page() {
                 <Button
                   onClick={() => handleShampooAction(false)}
                   variant="outline"
-                  className="flex-1 h-14 text-base font-semibold bg-transparent border-2 border-primary text-primary hover:bg-primary/10 rounded-2xl shadow-xl"
+                  className="flex-1 h-12 text-sm font-semibold bg-transparent border-2 border-primary text-primary hover:bg-primary/10 rounded-xl"
                 >
                   今日はパス
                 </Button>
               </div>
 
-              {/* Network Warning */}
+              {/* Status Messages */}
               {isConnected && !contractAddress && (
-                <Card className="w-full max-w-sm p-4 bg-destructive/10 border-destructive/20">
-                  <p className="text-destructive text-sm text-center">
+                <Card className="w-full max-w-sm p-3 bg-destructive/10 border-destructive/20">
+                  <p className="text-destructive text-xs text-center">
                     ⚠️ Base または Base Sepolia ネットワークに切り替えてください
                   </p>
                 </Card>
               )}
 
-              {/* Error Display with Close Button */}
               {showError && writeError && (
-                <Card className="w-full max-w-sm p-4 bg-destructive/10 border-destructive/20 relative">
+                <Card className="w-full max-w-sm p-3 bg-destructive/10 border-destructive/20 relative">
                   <button
                     onClick={() => setShowError(false)}
-                    className="absolute top-2 right-2 text-destructive hover:text-destructive/80 text-xl"
+                    className="absolute top-1 right-1 text-destructive hover:text-destructive/80 text-lg"
                   >
                     ×
                   </button>
-                  <p className="text-destructive text-sm text-center pr-6">
+                  <p className="text-destructive text-xs text-center pr-6">
                     エラー: {writeError.message}
                   </p>
                 </Card>
               )}
 
-              {/* Recent Logs */}
-              <div className="w-full max-w-sm space-y-3">
-                <h3 className="text-lg font-semibold text-foreground text-center">最近の記録</h3>
-                <div className="space-y-2">
-                  {logs.slice(0, 5).map((log) => (
-                    <Card key={log.id} className="p-3 bg-card/30 border-primary/10">
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-col">
-                          <span className="text-sm text-card-foreground">
-                            {new Date(log.date).toLocaleDateString('ja-JP')}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {log.time}
+              {/* Recent Activity */}
+              {logs.length > 0 && (
+                <div className="w-full max-w-sm space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground text-center">最近の記録</h3>
+                  <div className="space-y-2">
+                    {logs.slice(0, 3).map((log) => (
+                      <Card key={log.id} className="p-3 bg-card/50 border-primary/10">
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-xs text-card-foreground">
+                              {new Date(log.date).toLocaleDateString('ja-JP')}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {log.time}
+                            </span>
+                          </div>
+                          <span className="text-xs">
+                            {log.shampooed ? "🧴 シャンプー" : "💜 パス"}
                           </span>
                         </div>
-                        <span className="text-sm">
-                          {log.shampooed ? "🧴 シャンプーした" : "パス"}
-                        </span>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
           {activeTab === "calendar" && (
-            <div className="flex-1 flex flex-col items-center justify-center p-6">
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-primary font-sans mb-4">カレンダー機能</h2>
-                <p className="text-muted-foreground">近日公開予定</p>
+                <div className="text-4xl mb-4">📅</div>
+                <h2 className="text-xl font-bold text-primary mb-2">カレンダー機能</h2>
+                <p className="text-sm text-muted-foreground">近日公開予定</p>
               </div>
             </div>
           )}
         </main>
 
-        <footer className="mt-2 pt-4 flex justify-center">
+        {/* Bottom Navigation - Fixed at bottom */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-sm border-t border-border">
+          <div className="w-full max-w-md mx-auto px-4 py-2">
+            <div className="flex justify-center space-x-8">
+              <button
+                onClick={() => setActiveTab("home")}
+                className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-xl transition-colors ${
+                  activeTab === "home"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <div className="text-lg">🏠</div>
+                <span className="text-xs font-medium">ホーム</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("calendar")}
+                className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-xl transition-colors ${
+                  activeTab === "calendar"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <div className="text-lg">📅</div>
+                <span className="text-xs font-medium">カレンダー</span>
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        {/* MiniKit Footer */}
+        <div className="pb-20 pt-4 flex justify-center">
           <Button
             variant="ghost"
             size="sm"
@@ -340,7 +350,7 @@ export default function Page() {
           >
             Built on Base with MiniKit
           </Button>
-        </footer>
+        </div>
       </div>
     </div>
   )
