@@ -4,22 +4,21 @@ export const metadata: Metadata = {
   title: '風呂キャン止めるくん',
   description: 'シャンプー習慣をブロックチェーンで記録するBase Mini App',
   other: {
-    // Farcaster Frame metadata
-    'fc:frame': 'vNext',
-    'fc:frame:image': 'https://furocan.vercel.app/splash.svg',
-    'fc:frame:image:aspect_ratio': '1.91:1',
-    'fc:frame:button:1': 'アプリを開く',
-    'fc:frame:button:1:action': 'link',
-    'fc:frame:button:1:target': 'https://furocan.vercel.app',
-    'fc:frame:post_url': 'https://furocan.vercel.app/api/frame',
-    // Open Frame metadata
-    'of:version': 'vNext',
-    'of:accepts:farcaster': 'vNext',
-    'of:image': 'https://furocan.vercel.app/splash.svg',
-    'of:image:alt': '風呂キャン止めるくん - シャンプー習慣トラッカー',
-    'of:button:1': 'アプリを開く',
-    'of:button:1:action': 'link',
-    'of:button:1:target': 'https://furocan.vercel.app',
+    // Farcaster Frame metadata (JSON format as per official docs)
+    'fc:frame': JSON.stringify({
+      version: "next",
+      imageUrl: "https://furocan.vercel.app/splash.svg",
+      button: {
+        title: "アプリを開く",
+        action: {
+          type: "launch_frame",
+          name: "風呂キャン止めるくん",
+          url: "https://furocan.vercel.app",
+          splashImageUrl: "https://furocan.vercel.app/splash.svg",
+          splashBackgroundColor: "#4F46E5"
+        }
+      }
+    }),
   },
 };
 
