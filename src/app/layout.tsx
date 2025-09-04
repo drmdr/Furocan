@@ -44,10 +44,19 @@ export const metadata: Metadata = {
     // Farcaster Frame metadata
     'fc:frame': 'vNext',
     'fc:frame:image': 'https://furocan.vercel.app/splash.svg',
-    'fc:frame:button:1': 'シャンプー記録を開始',
+    'fc:frame:image:aspect_ratio': '1.91:1',
+    'fc:frame:button:1': 'アプリを開く',
     'fc:frame:button:1:action': 'link',
     'fc:frame:button:1:target': 'https://furocan.vercel.app',
     'fc:frame:post_url': 'https://furocan.vercel.app/api/frame',
+    // Mini App specific metadata
+    'of:version': 'vNext',
+    'of:accepts:farcaster': 'vNext',
+    'of:image': 'https://furocan.vercel.app/splash.svg',
+    'of:image:alt': '風呂キャン止めるくん - シャンプー習慣トラッカー',
+    'of:button:1': 'アプリを開く',
+    'of:button:1:action': 'link',
+    'of:button:1:target': 'https://furocan.vercel.app',
   },
 }
 
@@ -58,6 +67,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        <meta property="fc:frame" content="vNext" />
+        <meta property="fc:frame:image" content="https://furocan.vercel.app/splash.svg" />
+        <meta property="fc:frame:image:aspect_ratio" content="1.91:1" />
+        <meta property="fc:frame:button:1" content="アプリを開く" />
+        <meta property="fc:frame:button:1:action" content="link" />
+        <meta property="fc:frame:button:1:target" content="https://furocan.vercel.app" />
+        <meta property="fc:frame:post_url" content="https://furocan.vercel.app/api/frame" />
+        <meta property="of:version" content="vNext" />
+        <meta property="of:accepts:farcaster" content="vNext" />
+        <meta property="of:image" content="https://furocan.vercel.app/splash.svg" />
+        <meta property="of:image:alt" content="風呂キャン止めるくん - シャンプー習慣トラッカー" />
+        <meta property="of:button:1" content="アプリを開く" />
+        <meta property="of:button:1:action" content="link" />
+        <meta property="of:button:1:target" content="https://furocan.vercel.app" />
+      </head>
       <body className={`${hachiMaruPop.variable} ${GeistMono.variable} font-sans`}>
         <Providers>
           <Suspense fallback={null}>
