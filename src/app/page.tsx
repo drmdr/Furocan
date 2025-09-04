@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId } from 'wagmi'
 import { 
   useMiniKit,
-  useAddFrame,
+  useComposeCast,
   useOpenUrl,
 } from '@coinbase/onchainkit/minikit'
 import {
@@ -28,7 +28,7 @@ import { saveNoShampooRecord, addToShampooLogs, getShampooLogs, type ShampooLog 
 export default function Page() {
   // MiniKit hooks
   const { setFrameReady, isFrameReady, context } = useMiniKit()
-  const addFrame = useAddFrame()
+  const { composeCast } = useComposeCast()
   const openUrl = useOpenUrl()
   
   // Wagmi hooks
@@ -38,7 +38,7 @@ export default function Page() {
   const { isLoading: isConfirming } = useWaitForTransactionReceipt()
   
   // State
-  const [frameAdded, setFrameAdded] = useState(false)
+
   const [activeTab, setActiveTab] = useState<"home" | "calendar">("home")
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   const [showNoShampooPopup, setShowNoShampooPopup] = useState(false)
@@ -67,36 +67,15 @@ export default function Page() {
     }
   }, [writeError])
 
-  // Frame management
-  const handleAddFrame = useCallback(async () => {
-    const result = await addFrame()
-    setFrameAdded(Boolean(result))
-  }, [addFrame])
+  // Share to Farcaster
+  const handleShareToFarcaster = () => {
+    composeCast({
+      text: '今日もシャンプーできてえらい！ #風呂キャン止めるくん',
+      embeds: ['https://furocan.vercel.app'],
+    })
+  }
 
-  const saveFrameButton = useMemo(() => {
-    if (context && !context.client.added) {
-      return (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleAddFrame}
-          className="text-primary p-2 text-xs"
-        >
-          + Save
-        </Button>
-      )
-    }
 
-    if (frameAdded) {
-      return (
-        <div className="flex items-center space-x-1 text-xs font-medium text-primary">
-          <span>✓ Saved</span>
-        </div>
-      )
-    }
-
-    return null
-  }, [context, frameAdded, handleAddFrame])
 
   // Main action handler
   const handleShampooAction = async (shampooed: boolean) => {
@@ -151,12 +130,20 @@ export default function Page() {
               </button>
               <div className="text-4xl mb-2">🎉</div>
               <p className="font-bold text-lg">{successMessage}</p>
-              <button
-                onClick={() => setShowSuccessPopup(false)}
-                className="mt-4 px-4 py-2 bg-primary-foreground text-primary rounded-lg hover:bg-primary-foreground/90 transition-colors"
-              >
-                閉じる
-              </button>
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={handleShareToFarcaster}
+                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                >
+                  📢 シェア
+                </button>
+                <button
+                  onClick={() => setShowSuccessPopup(false)}
+                  className="flex-1 px-4 py-2 bg-primary-foreground text-primary rounded-lg hover:bg-primary-foreground/90 transition-colors text-sm font-medium"
+                >
+                  閉じる
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -187,7 +174,6 @@ export default function Page() {
         <header className="flex justify-between items-center p-4 h-16">
           <div className="flex items-center space-x-2">
             <span className="text-2xl">🧴</span>
-            <span className="text-sm text-muted-foreground font-medium">風呂キャン止めるくん</span>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -205,7 +191,7 @@ export default function Page() {
                 <WalletDropdownDisconnect />
               </WalletDropdown>
             </Wallet>
-            {saveFrameButton}
+
           </div>
         </header>
 
@@ -216,7 +202,7 @@ export default function Page() {
               {/* App Title */}
               <div className="text-center space-y-2 mt-4">
                 <h1 className="text-2xl font-bold text-primary">風呂キャン止めるくん</h1>
-                <p className="text-sm text-muted-foreground">今日もお疲れさま</p>
+
               </div>
 
               {/* Character Display */}
@@ -341,15 +327,16 @@ export default function Page() {
         </nav>
 
         {/* MiniKit Footer */}
-        <div className="pb-20 pt-4 flex justify-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground text-xs"
-            onClick={() => openUrl("https://base.org/builders/minikit")}
-          >
-            Built on Base with MiniKit
-          </Button>
+        <div className="pb-24 pt-8 flex justify-center">
+          <div className="text-muted-foreground text-xs">
+            Built on Base with MiniKit by{' '}
+            <button
+              onClick={() => openUrl("https://drive.google.com/file/d/1Ydha03M8NJ6xDeTu3FiZFjAhKJS5FXpO/view?usp=sharing")}
+              className="text-primary hover:text-primary/80 underline"
+            >
+              UdonSunagimo
+            </button>
+          </div>
         </div>
       </div>
     </div>
