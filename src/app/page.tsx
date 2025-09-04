@@ -178,7 +178,7 @@ export default function Page() {
           
           <div className="flex items-center space-x-2">
             <Wallet>
-              <ConnectWallet>
+              <ConnectWallet className="px-3 py-2 border-2 border-gray-400 text-gray-600 rounded-lg hover:border-gray-500 hover:text-gray-700 transition-colors">
                 <Name className="text-inherit text-sm" />
               </ConnectWallet>
               <WalletDropdown>
@@ -207,12 +207,12 @@ export default function Page() {
 
               {/* Character Display */}
               <div className="relative">
-                <div className="w-40 h-40 bg-card rounded-full flex items-center justify-center border-4 border-primary/20 shadow-lg">
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                <div className="w-48 h-48 bg-card rounded-full flex items-center justify-center border-4 border-primary/20 shadow-lg">
+                  <div className="w-40 h-40 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                     <img 
                       src="/shampoo-top.png" 
-                      alt="シャンプー" 
-                      className="w-20 h-20 object-contain"
+                      alt="風呂キャンしてそうなメンヘラの女の子" 
+                      className="w-32 h-32 object-contain"
                     />
                   </div>
                 </div>
