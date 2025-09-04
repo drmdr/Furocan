@@ -22,6 +22,7 @@ import {
 } from '@coinbase/onchainkit/wallet'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
+import Calendar from '../components/Calendar'
 import { SHAMPOO_TRACKER_ABI, CONTRACT_ADDRESSES } from '../lib/contract'
 import { saveNoShampooRecord, addToShampooLogs, getShampooLogs, type ShampooLog } from '../lib/localStorage'
 
@@ -290,12 +291,12 @@ export default function Page() {
           )}
 
           {activeTab === "calendar" && (
-            <div className="flex flex-col items-center justify-center min-h-[400px]">
-              <div className="text-center">
-                <div className="text-4xl mb-4">📅</div>
-                <h2 className="text-xl font-bold text-primary mb-2">カレンダー機能</h2>
-                <p className="text-sm text-muted-foreground">近日公開予定</p>
+            <div className="flex flex-col items-center space-y-4 pb-20">
+              <div className="text-center space-y-2 mt-4">
+                <h2 className="text-xl font-bold text-primary">カレンダー</h2>
+                <p className="text-sm text-muted-foreground">シャンプー記録を確認</p>
               </div>
+              <Calendar />
             </div>
           )}
         </main>
