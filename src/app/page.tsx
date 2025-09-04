@@ -209,7 +209,11 @@ export default function Page() {
               <div className="relative">
                 <div className="w-40 h-40 bg-card rounded-full flex items-center justify-center border-4 border-primary/20 shadow-lg">
                   <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                    <span className="text-5xl">🧴</span>
+                    <img 
+                      src="/shampoo-top.png" 
+                      alt="シャンプー" 
+                      className="w-20 h-20 object-contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -331,7 +335,7 @@ export default function Page() {
           <div className="text-muted-foreground text-xs">
             Built on Base with MiniKit by{' '}
             <button
-              onClick={() => openUrl("https://drive.google.com/file/d/1Ydha03M8NJ6xDeTu3FiZFjAhKJS5FXpO/view?usp=sharing")}
+              onClick={() => openUrl("https://drive.google.com/file/d/1kDDqzAfebtTaRHpgU6YrQSdtBuyUZzZK/view?usp=sharing")}
               className="text-primary hover:text-primary/80 underline"
             >
               UdonSunagimo
