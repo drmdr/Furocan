@@ -296,7 +296,7 @@ export default function Page() {
                 <h2 className="text-xl font-bold text-primary">カレンダー</h2>
                 <p className="text-sm text-muted-foreground">シャンプー記録を確認</p>
               </div>
-              <Calendar />
+              <Calendar isWalletConnected={isConnected} />
             </div>
           )}
         </main>
@@ -318,13 +318,16 @@ export default function Page() {
               </button>
               <button
                 onClick={() => setActiveTab("calendar")}
+                disabled={!isConnected}
                 className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-xl transition-colors ${
                   activeTab === "calendar"
                     ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    : isConnected
+                    ? "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground/30 cursor-not-allowed"
                 }`}
               >
-                <div className="text-lg">📅</div>
+                <div className="text-lg">{isConnected ? "📅" : "🔒"}</div>
                 <span className="text-xs font-medium">カレンダー</span>
               </button>
             </div>

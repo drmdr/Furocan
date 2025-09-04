@@ -1,8 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { getShampooLogs } from '../lib/localStorage'
 
-export default function Calendar() {
+interface CalendarProps {
+  isWalletConnected: boolean
+}
+
+export default function Calendar({ isWalletConnected }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   
   // 安全な日付計算
@@ -49,7 +54,27 @@ export default function Calendar() {
   
   const weekDays = ['日', '月', '火', '水', '木', '金', '土']
   
+  // ナビゲーション制限の計算
+  const today = new Date()
+  const currentYear = currentDate.getFullYear()
+  const currentMonth = currentDate.getMonth()
+  
+  // 未来の月かチェック
+  const isFutureMonth = currentYear > today.getFullYear() || 
+    (currentYear === today.getFullYear() && currentMonth > today.getMonth())
+  
+  // 過去のログがあるかチェック
+  const logs = getShampooLogs()
+  const hasHistoricalLogs = logs.length > 0
+  const oldestLogDate = hasHistoricalLogs ? new Date(logs[logs.length - 1].date) : today
+  const canGoToPrevMonth = hasHistoricalLogs && 
+    (currentYear > oldestLogDate.getFullYear() || 
+     (currentYear === oldestLogDate.getFullYear() && currentMonth > oldestLogDate.getMonth()))
+  
   const navigateMonth = (direction: 'prev' | 'next') => {
+    if (direction === 'next' && isFutureMonth) return
+    if (direction === 'prev' && !canGoToPrevMonth) return
+    
     const newDate = new Date(currentDate)
     if (direction === 'prev') {
       newDate.setMonth(newDate.getMonth() - 1)
@@ -59,6 +84,21 @@ export default function Calendar() {
     setCurrentDate(newDate)
   }
   
+  // ウォレット未接続時の表示
+  if (!isWalletConnected) {
+    return (
+      <div className="w-full max-w-sm mx-auto space-y-4">
+        <div className="p-4 bg-card rounded-lg border opacity-50">
+          <div className="text-center">
+            <div className="text-4xl mb-4">🔒</div>
+            <h2 className="text-xl font-bold text-muted-foreground mb-2">カレンダー機能</h2>
+            <p className="text-sm text-muted-foreground">ウォレットを接続してください</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full max-w-sm mx-auto space-y-4">
       {/* カレンダーヘッダー */}
@@ -66,7 +106,12 @@ export default function Calendar() {
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => navigateMonth('prev')}
-            className="p-2 hover:bg-primary/10 rounded-lg transition-colors text-lg"
+            disabled={!canGoToPrevMonth}
+            className={`p-2 rounded-lg transition-colors text-lg ${
+              canGoToPrevMonth 
+                ? 'hover:bg-primary/10 text-foreground' 
+                : 'text-muted-foreground/30 cursor-not-allowed'
+            }`}
           >
             ←
           </button>
@@ -75,7 +120,12 @@ export default function Calendar() {
           </h2>
           <button
             onClick={() => navigateMonth('next')}
-            className="p-2 hover:bg-primary/10 rounded-lg transition-colors text-lg"
+            disabled={isFutureMonth}
+            className={`p-2 rounded-lg transition-colors text-lg ${
+              !isFutureMonth 
+                ? 'hover:bg-primary/10 text-foreground' 
+                : 'text-muted-foreground/30 cursor-not-allowed'
+            }`}
           >
             →
           </button>

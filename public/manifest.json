@@ -5,15 +5,15 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f5f3ff",
-  "theme_color": "#d946ef",
+  "theme_color": "#ec4899",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/shampoo-top.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/shampoo-top.png",
       "sizes": "512x512",
       "type": "image/png"
     }
