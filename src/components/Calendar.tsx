@@ -13,7 +13,6 @@ export default function Calendar() {
     
     // 月の最初の日
     const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
     
     // カレンダーの開始日（日曜日から開始）
     const startDate = new Date(firstDay)
@@ -50,7 +49,7 @@ export default function Calendar() {
   
   const weekDays = ['日', '月', '火', '水', '木', '金', '土']
   
-  const navigateMonth = (direction) => {
+  const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate)
     if (direction === 'prev') {
       newDate.setMonth(newDate.getMonth() - 1)
