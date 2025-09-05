@@ -28,7 +28,7 @@ export default function Page() {
   const openUrl = useOpenUrl()
   
   // Wagmi hooks
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
   const chainId = useChainId()
   const { writeContract, isPending: isWritePending, error: writeError } = useWriteContract()
   const { isLoading: isConfirming } = useWaitForTransactionReceipt()
@@ -182,7 +182,9 @@ export default function Page() {
                   onClick={() => setShowWalletMenu((v) => !v)}
                   className="px-3 py-2 rounded-full border-2 border-gray-400 text-gray-700 bg-white/70 backdrop-blur hover:border-gray-500 transition-colors text-sm font-medium"
                 >
-                  <Address />
+                  <span className="font-mono tracking-tight">
+                    {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}
+                  </span>
                 </button>
               ) : (
                 <ConnectWallet className="px-3 py-2 border-2 border-gray-400 text-gray-600 rounded-lg hover:border-gray-500 hover:text-gray-700 transition-colors">
