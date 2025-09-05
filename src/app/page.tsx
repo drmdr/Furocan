@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId } from 'wagmi'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useDisconnect } from 'wagmi'
 import { 
   useMiniKit,
   useComposeCast,
@@ -14,12 +14,7 @@ import {
   Avatar,
   EthBalance,
 } from '@coinbase/onchainkit/identity'
-import {
-  ConnectWallet,
-  Wallet,
-  WalletDropdown,
-  WalletDropdownDisconnect,
-} from '@coinbase/onchainkit/wallet'
+import { ConnectWallet, Wallet } from '@coinbase/onchainkit/wallet'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
 import Calendar from '../components/Calendar'
@@ -37,6 +32,7 @@ export default function Page() {
   const chainId = useChainId()
   const { writeContract, isPending: isWritePending, error: writeError } = useWriteContract()
   const { isLoading: isConfirming } = useWaitForTransactionReceipt()
+  const { disconnect } = useDisconnect()
   
   // State
 
@@ -46,6 +42,7 @@ export default function Page() {
   const [successMessage, setSuccessMessage] = useState('')
   const [showError, setShowError] = useState(false)
   const [logs, setLogs] = useState<ShampooLog[]>([])
+  const [showWalletMenu, setShowWalletMenu] = useState(false)
 
   const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]
 
@@ -177,22 +174,61 @@ export default function Page() {
             <span className="text-2xl">🧴</span>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="relative flex items-center">
             <Wallet>
-              <ConnectWallet className="px-3 py-2 border-2 border-gray-400 text-gray-600 rounded-lg hover:border-gray-500 hover:text-gray-700 transition-colors">
-                <Name className="text-inherit text-sm" />
-              </ConnectWallet>
-              <WalletDropdown>
-                <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
-                  <Avatar />
-                  <Name />
+              {isConnected ? (
+                <button
+                  type="button"
+                  onClick={() => setShowWalletMenu((v) => !v)}
+                  className="px-3 py-2 rounded-full border-2 border-gray-400 text-gray-700 bg-white/70 backdrop-blur hover:border-gray-500 transition-colors text-sm font-medium"
+                >
                   <Address />
-                  <EthBalance />
-                </Identity>
-                <WalletDropdownDisconnect />
-              </WalletDropdown>
+                </button>
+              ) : (
+                <ConnectWallet className="px-3 py-2 border-2 border-gray-400 text-gray-600 rounded-lg hover:border-gray-500 hover:text-gray-700 transition-colors">
+                  <Name className="text-inherit text-sm" />
+                </ConnectWallet>
+              )}
             </Wallet>
 
+            {isConnected && showWalletMenu && (
+              <>
+                <button
+                  aria-label="Close wallet menu"
+                  onClick={() => setShowWalletMenu(false)}
+                  className="fixed inset-0 z-40 bg-transparent"
+                />
+                <div className="absolute right-0 top-12 z-50 w-64 rounded-xl border bg-white/95 shadow-xl backdrop-blur">
+                  <div className="px-4 pt-3 pb-2">
+                    <div className="flex items-center gap-3">
+                      <Avatar />
+                      <div className="min-w-0">
+                        <Name className="block text-sm font-semibold text-gray-900 truncate" />
+                        <div className="text-xs text-gray-600 flex items-center gap-1">
+                          <Address />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-700">
+                      <EthBalance />
+                    </div>
+                  </div>
+                  <div className="border-t" />
+                  <div className="p-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowWalletMenu(false)
+                        disconnect()
+                      }}
+                      className="w-full px-3 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
