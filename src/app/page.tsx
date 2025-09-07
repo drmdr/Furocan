@@ -110,12 +110,14 @@ export default function Page() {
       } catch (error) {
         console.error('Transaction failed:', error)
       }
-    } else {
-      saveNoShampooRecord()
-      setLogs(getShampooLogs())
-      // Replace top image with skip image until app closes
-      setTopImage('/shampoo-skip.png')
-    }
+      } else {
+        saveNoShampooRecord()
+        setLogs(getShampooLogs())
+        // Replace top image with skip image until app closes
+        setTopImage('/shampoo-skip.png')
+        // Show encouraging message for skipping today
+        setShowNoShampooPopup(true)
+      }
   }
 
   return (
@@ -131,8 +133,8 @@ export default function Page() {
               >
                 ×
               </button>
-              <div className="text-4xl mb-2">🎉</div>
-              <p className="font-bold text-lg">{successMessage}</p>
+              <div className="text-4xl mb-2">??</div>
+              <p className="font-bold text-lg">?????!???????!</p>
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={handleShareToFarcaster}
@@ -161,8 +163,8 @@ export default function Page() {
               >
                 ×
               </button>
-              <div className="text-4xl mb-2">💜</div>
-              <p className="font-bold text-lg">生きててえらい！</p>
+              <div className="text-4xl mb-2">??</div>
+              <p className="font-bold text-lg">?????!???????!</p>
               <button
                 onClick={() => setShowNoShampooPopup(false)}
                 className="mt-4 px-4 py-2 bg-secondary-foreground text-secondary rounded-lg hover:bg-secondary-foreground/90 transition-colors"
@@ -201,7 +203,7 @@ export default function Page() {
             {isConnected && showWalletMenu && (
               <>
                 <button
-                  aria-label="Close wallet menu"
+                  ari�label="Close wallet menu"
                   onClick={() => setShowWalletMenu(false)}
                   className="fixed inset-0 z-40 bg-transparent"
                 />
@@ -315,7 +317,7 @@ export default function Page() {
                         <div className="flex items-center justify-between">
                           <div className="flex flex-col">
                             <span className="text-xs text-card-foreground">
-                              {new Date(log.date).toLocaleDateString('ja-JP')}
+                              {new Date(log.date).toLocaleDateString('j�JP')}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               {log.time}
@@ -393,4 +395,5 @@ export default function Page() {
     </div>
   )
 }
+
 
