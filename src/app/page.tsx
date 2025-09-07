@@ -43,6 +43,8 @@ export default function Page() {
   const [showError, setShowError] = useState(false)
   const [logs, setLogs] = useState<ShampooLog[]>([])
   const [showWalletMenu, setShowWalletMenu] = useState(false)
+  // End screen control: 'done' | 'skip' | null
+  const [finalScreen, setFinalScreen] = useState<null | 'done' | 'skip'>(null)
 
   const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]
 
@@ -92,6 +94,8 @@ export default function Page() {
 
         addToShampooLogs(true)
         setLogs(getShampooLogs())
+        // Show the persistent "done" screen until app closes
+        setFinalScreen('done')
 
         const messages = [
           '今日もお疲れさま！',
@@ -109,15 +113,34 @@ export default function Page() {
     } else {
       saveNoShampooRecord()
       setLogs(getShampooLogs())
-      setShowNoShampooPopup(true)
+      // Show the persistent "skip" screen until app closes
+      setFinalScreen('skip')
     }
   }
 
   return (
     <div className="flex flex-col min-h-screen font-sans text-foreground bg-background">
       <div className="w-full max-w-md mx-auto">
-        {/* Success Popup */}
-        {showSuccessPopup && (
+        {/* Final state screens: shown until the app/page closes */}
+        {finalScreen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+            {finalScreen === 'done' ? (
+              <img
+                src="/shampoo-done.png"
+                alt="shampoo done"
+                className="max-w-full max-h-full object-contain"
+              />
+            ) : (
+              <img
+                src="/shampoo-skip.png"
+                alt="shampoo skip"
+                className="max-w-full max-h-full object-contain"
+              />
+            )}
+          </div>
+        )}
+        {/* Success Popup (disabled when final screen is active) */}
+        {showSuccessPopup && !finalScreen && (
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
             <div className="bg-primary text-primary-foreground p-6 rounded-2xl shadow-xl max-w-sm w-full text-center relative">
               <button
@@ -146,8 +169,8 @@ export default function Page() {
           </div>
         )}
 
-        {/* No Shampoo Popup */}
-        {showNoShampooPopup && (
+        {/* No Shampoo Popup (disabled when final screen is active) */}
+        {showNoShampooPopup && !finalScreen && (
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
             <div className="bg-secondary text-secondary-foreground p-6 rounded-2xl shadow-xl max-w-sm w-full text-center relative">
               <button
@@ -246,12 +269,12 @@ export default function Page() {
 
               {/* Character Display */}
               <div className="relative">
-                <div className="w-48 h-48 bg-card rounded-full flex items-center justify-center border-4 border-primary/20 shadow-lg">
-                  <div className="w-40 h-40 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                <div className="w-full flex items-center justify-center">
+                  <div className="w-full flex items-center justify-center">
                     <img 
                       src="/shampoo-top.png" 
                       alt="風呂キャンしてそうなメンヘラの女の子" 
-                      className="w-32 h-32 object-contain"
+                      className="w-full max-w-sm object-contain"
                     />
                   </div>
                 </div>
@@ -388,3 +411,4 @@ export default function Page() {
     </div>
   )
 }
+
