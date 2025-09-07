@@ -156,7 +156,7 @@ export default function Page() {
         {/* Header */}
         <header className="flex justify-between items-center p-4 h-16">
           <div className="flex items-center space-x-2">
-            <span className="text-xl font-bold">風呂キャン止めるくん</span>
+            <img src="/icon.svg" alt="Shampoo" className="w-6 h-6" />
           </div>
           <ConnectWallet className="px-3 py-2 border-2 border-gray-400 text-gray-600 rounded-lg hover:border-gray-500 hover:text-gray-700 transition-colors">
             <Name className="text-inherit text-sm" />
@@ -169,7 +169,7 @@ export default function Page() {
             <div className="flex flex-col items-center space-y-6 pb-20">
               {/* Title */}
               <div className="text-center space-y-2 mt-4">
-                <h1 className="text-2xl font-bold text-primary">シャンプー習慣を記録しよう</h1>
+                <h1 className="text-2xl font-bold text-primary">風呂キャン止めるくん</h1>
               </div>
 
               {/* Top Image */}
